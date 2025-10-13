@@ -1,8 +1,8 @@
 ---
 title: Hello blog
 date: 2025-10-11 17:48:30 +0100
-categories: [] ### [TOP_CATEGORY, SUB_CATEGORY]
-tags: []     # TAG names should always be lowercase
+tags: [style, markdown, chirpy]
+categories: [test]
 #description: Short summary of the post.
 ---
 

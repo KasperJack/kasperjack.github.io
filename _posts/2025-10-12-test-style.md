@@ -43,7 +43,6 @@ This is a standard paragraph. You can use **bold**, *italic*, ~~strikethrough~~,
 
 ## Links and Buttons
 
-This is a [regular link](https://github.com/cotes2020/jekyll-theme-chirpy).
 
 
 
