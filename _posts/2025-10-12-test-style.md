@@ -18,13 +18,11 @@ image: /assets/img/sample/sc4.jpg
 ##### H5 Heading
 ###### H6 Heading
 
----
 
 ## Paragraph
 
 This is a standard paragraph. You can use **bold**, *italic*, ~~strikethrough~~, and `inline code` within text.
 
----
 
 ## Lists
 
@@ -42,22 +40,18 @@ This is a standard paragraph. You can use **bold**, *italic*, ~~strikethrough~~,
    1. Sub Item
    2. Sub Item 2
 
----
 
 ## Links and Buttons
 
 This is a [regular link](https://github.com/cotes2020/jekyll-theme-chirpy).
 
-**Chirpy Button:**  
-<a href="https://github.com/cotes2020/chirpy" class="btn">Click Me</a>
 
----
+
 
 ## Blockquote
 
 > This is a blockquote. Great for highlighting quotes or info blocks.
 
----
 
 ## Code
 
@@ -88,9 +82,8 @@ _Image Caption_
 `/path/to/a/file.extend`{: .filepath}
 
 
-```
+
 This is a plaintext code snippet.
-```
 
 
 
