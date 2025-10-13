@@ -1,0 +1,178 @@
+<div style="max-width: 100%; margin: 60px auto 40px auto; padding: 30px; background: #1a1a1a; border: 0px solid rgb(44, 45, 45); border-radius: 4px; font-family: inherit;">
+  <h3 style="color: #cccccc; margin: 0 0 10px 0; font-size: 18px; text-align: center;">OSI Model Ordering Game</h3>
+  <p style="color: #868686; margin: 0 0 25px 0; font-size: 13px; text-align: center;">Drag the OSI layers into the correct order (1-7 from bottom to top)</p>
+
+  <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+    <!-- Correct Order (Left) -->
+    <div style="min-width: 280px;">
+      <p style="color: #cccccc; font-size: 13px; font-weight: bold; margin-bottom: 10px;">Correct Order:</p>
+      <div id="correctOrderOSI" style="display: flex; flex-direction: column-reverse; gap: 8px; min-height: 400px; padding: 15px; background: rgba(0, 240, 255, 0.05); border: 2px dashed #00F0FF; border-radius: 4px;">
+      </div>
+    </div>
+
+    <!-- Draggable Items (Right) -->
+    <div style="min-width: 280px;">
+      <p style="color: #cccccc; font-size: 13px; font-weight: bold; margin-bottom: 10px;">Layers (Drag to arrange):</p>
+      <div id="layerContainerOSI" style="display: flex; flex-direction: column; gap: 8px; min-height: 400px; padding: 15px; background: rgba(175, 176, 177, 0.05); border: 2px dashed rgb(44, 45, 45); border-radius: 4px;">
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 25px;">
+    <button
+      id="checkBtnOSI"
+      style="padding: 12px 24px; border: 1px solid rgb(44, 45, 45); background: #1e1e1e; color: rgb(175, 176, 177); font-size: 14px; cursor: pointer; transition: all 0.2s; font-family: inherit; border-radius: 3px; margin-right: 10px;"
+      onmouseover="this.style.background='#252525'; this.style.borderColor='#00F0FF'; this.style.color='#00F0FF';"
+      onmouseout="this.style.background='#1e1e1e'; this.style.borderColor='rgb(44, 45, 45)'; this.style.color='rgb(175, 176, 177)';"
+    >
+      Check Answer
+    </button>
+
+    <button
+      id="resetBtnOSI"
+      style="padding: 12px 24px; border: 1px solid rgb(44, 45, 45); background: #1e1e1e; color: rgb(175, 176, 177); font-size: 14px; cursor: pointer; transition: all 0.2s; font-family: inherit; border-radius: 3px;"
+      onmouseover="this.style.background='#252525'; this.style.borderColor='#cccccc'; this.style.color='#cccccc';"
+      onmouseout="this.style.background='#1e1e1e'; this.style.borderColor='rgb(44, 45, 45)'; this.style.color='rgb(175, 176, 177)';"
+    >
+      Reset
+    </button>
+  </div>
+
+  <p id="resultOSI" style="color: #00F0FF; margin-top: 20px; font-size: 14px; text-align: center; min-height: 20px; font-weight: bold;"></p>
+</div>
+
+<script>
+const osiLayersData = [
+  {num: 1, name: 'Physical', color: '#FF6B6B'},
+  {num: 2, name: 'Data Link', color: '#4ECDC4'},
+  {num: 3, name: 'Network', color: '#45B7D1'},
+  {num: 4, name: 'Transport', color: '#FFA07A'},
+  {num: 5, name: 'Session', color: '#98D8C8'},
+  {num: 6, name: 'Presentation', color: '#F7DC6F'},
+  {num: 7, name: 'Application', color: '#BB8FCE'}
+];
+
+const layerContainerOSI = document.getElementById('layerContainerOSI');
+const correctOrderOSI = document.getElementById('correctOrderOSI');
+const checkBtnOSI = document.getElementById('checkBtnOSI');
+const resetBtnOSI = document.getElementById('resetBtnOSI');
+const resultOSI = document.getElementById('resultOSI');
+
+let draggedElOSI = null;
+
+function shuffleOSI(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function createLayerOSI(layer, draggable = true) {
+  const div = document.createElement('div');
+  div.draggable = draggable;
+  div.dataset.num = layer.num;
+  div.style.padding = '12px 16px';
+  div.style.backgroundColor = layer.color;
+  div.style.color = 'white';
+  div.style.borderRadius = '4px';
+  div.style.textAlign = 'center';
+  div.style.fontWeight = 'bold';
+  div.style.fontSize = '14px';
+  div.style.userSelect = 'none';
+  div.style.transition = 'all 0.2s';
+  div.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+
+  if (draggable) {
+    div.style.cursor = 'move';
+    div.addEventListener('dragstart', (e) => {
+      draggedElOSI = div;
+      div.style.opacity = '0.5';
+      div.style.transform = 'scale(0.95)';
+    });
+
+    div.addEventListener('dragend', (e) => {
+      div.style.opacity = '1';
+      div.style.transform = 'scale(1)';
+      draggedElOSI = null;
+    });
+
+    div.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      div.style.borderTop = '3px solid #00F0FF';
+    });
+
+    div.addEventListener('dragleave', (e) => {
+      div.style.borderTop = 'none';
+    });
+  } else {
+    div.style.cursor = 'default';
+    div.style.opacity = '0.4';
+  }
+
+  div.textContent = `Layer ${layer.num}: ${layer.name}`;
+  return div;
+}
+
+function initOSI() {
+  layerContainerOSI.innerHTML = '';
+  correctOrderOSI.innerHTML = '';
+  resultOSI.textContent = '';
+
+  const shuffled = shuffleOSI(osiLayersData);
+  shuffled.forEach(layer => {
+    layerContainerOSI.appendChild(createLayerOSI(layer, true));
+  });
+
+  osiLayersData.forEach(layer => {
+    correctOrderOSI.appendChild(createLayerOSI(layer, false));
+  });
+}
+
+layerContainerOSI.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+});
+
+layerContainerOSI.addEventListener('drop', (e) => {
+  e.preventDefault();
+  if (!draggedElOSI) return;
+
+  const allLayers = Array.from(layerContainerOSI.children);
+  const draggedIndex = allLayers.indexOf(draggedElOSI);
+  const target = e.target.closest('div[data-num]');
+
+  if (target && target !== draggedElOSI && allLayers.includes(target)) {
+    const targetIndex = allLayers.indexOf(target);
+    if (draggedIndex < targetIndex) {
+      target.parentNode.insertBefore(draggedElOSI, target.nextSibling);
+    } else {
+      target.parentNode.insertBefore(draggedElOSI, target);
+    }
+  }
+
+  const children = Array.from(layerContainerOSI.children);
+  children.forEach(child => {
+    child.style.borderTop = 'none';
+  });
+});
+
+checkBtnOSI.addEventListener('click', () => {
+  const items = Array.from(layerContainerOSI.children);
+  const current = items.map(el => parseInt(el.dataset.num));
+  const correct = [1, 2, 3, 4, 5, 6, 7];
+
+  if (JSON.stringify(current) === JSON.stringify(correct)) {
+    resultOSI.textContent = '✓ Perfect! You got the OSI model right!';
+    resultOSI.style.color = '#90EE90';
+  } else {
+    resultOSI.textContent = '✗ Not quite right. Try again!';
+    resultOSI.style.color = '#FF6B6B';
+  }
+});
+
+resetBtnOSI.addEventListener('click', initOSI);
+
+initOSI();
+</script>
