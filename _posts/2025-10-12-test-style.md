@@ -43,8 +43,10 @@ This is a standard paragraph. You can use **bold**, *italic*, ~~strikethrough~~,
 
 ## Links and Buttons
 
+This is a [regular link](https://github.com/cotes2020/jekyll-theme-chirpy).
 
-
+**Chirpy Button:**  
+<a href="https://github.com/cotes2020/chirpy" class="btn">Click Me</a>
 
 
 ## Blockquote

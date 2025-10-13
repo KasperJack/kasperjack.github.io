@@ -1,0 +1,257 @@
+<div id="quizContainer" style="max-width: 100%; margin: 60px auto 40px auto; padding: 30px; background: var(--main-bg); border: 0px solid var(--main-border-color); border-radius: 4px; font-family: inherit; outline: none !important;">
+  <h3 id="quizTitle" style="color: var(--heading-color); margin: 0 0 10px 0; font-size: 18px;"></h3>
+  <p id="quizDesc" style="color: var(--text-muted-color); margin: 0 0 25px 0; font-size: 13px;"></p>
+
+  <div id="questionsArea" style="margin-bottom: 30px;"></div>
+
+  <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+    <button
+      id="submitQuizBtn"
+      style="padding: 12px 24px; border: 1px solid var(--btn-border-color); background: var(--button-bg); color: var(--text-color); font-size: 14px; cursor: pointer; transition: all 0.2s; font-family: inherit; border-radius: 3px;"
+      onmouseover="this.style.borderColor='var(--link-color)'; this.style.color='var(--link-color)';"
+      onmouseout="this.style.borderColor='var(--btn-border-color)'; this.style.color='var(--text-color)';"
+    >
+      Submit Quiz
+    </button>
+  </div>
+
+  <p id="quizResult" style="color: var(--link-color); margin-top: 20px; font-size: 14px; text-align: center; min-height: 20px; font-weight: bold;"></p>
+</div>
+
+<script>
+// Quiz Engine
+class QuizEngine {
+  constructor(quizData) {
+    this.quizData = quizData;
+    this.userAnswers = {};
+    this.render();
+  }
+
+  render() {
+    const title = document.getElementById('quizTitle');
+    const desc = document.getElementById('quizDesc');
+    const area = document.getElementById('questionsArea');
+
+    title.textContent = this.quizData.title || 'Quiz';
+    desc.textContent = this.quizData.description || '';
+    area.innerHTML = '';
+
+    this.quizData.questions.forEach((q, idx) => {
+      area.appendChild(this.createQuestion(q, idx));
+    });
+  }
+
+  createQuestion(question, index) {
+    const container = document.createElement('div');
+    container.style.cssText = 'margin-bottom: 25px; padding: 20px; background: var(--tb-odd-bg); border-radius: 4px; border-left: 4px solid var(--blockquote-border-color);';
+    container.dataset.questionIndex = index;
+
+    const qNumber = document.createElement('p');
+    qNumber.style.cssText = 'color: var(--heading-color); margin: 0 0 15px 0; font-weight: bold; font-size: 15px;';
+    qNumber.textContent = `Q${index + 1}: ${question.question}`;
+    container.appendChild(qNumber);
+
+    let input;
+
+    if (question.type === 'multiple-choice') {
+      input = this.createMultipleChoice(question, index);
+    } else if (question.type === 'text') {
+      input = this.createTextInput(question, index);
+    } else if (question.type === 'arrange') {
+      input = this.createArrangeQuestion(question, index);
+    } else if (question.type === 'true-false') {
+      input = this.createTrueFalse(question, index);
+    }
+
+    container.appendChild(input);
+
+    // Add feedback area (hidden by default)
+    const feedback = document.createElement('div');
+    feedback.style.cssText = 'margin-top: 15px; padding: 10px 12px; border-radius: 3px; font-size: 13px; display: none;';
+    feedback.dataset.feedback = index;
+    container.appendChild(feedback);
+
+    return container;
+  }
+
+  createMultipleChoice(q, idx) {
+    const div = document.createElement('div');
+    const options = q.options || [];
+    options.forEach((opt, i) => {
+      const label = document.createElement('label');
+      label.style.cssText = 'display: block; margin-bottom: 10px; cursor: pointer; color: var(--text-color); font-size: 14px; transition: color 0.2s;';
+      label.onmouseover = () => label.style.color = 'var(--text-muted-highlight-color)';
+      label.onmouseout = () => label.style.color = 'var(--text-color)';
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = `q${idx}`;
+      input.value = i;
+      input.addEventListener('change', () => {
+        this.userAnswers[idx] = parseInt(i);
+      });
+      input.style.marginRight = '8px';
+      input.style.accentColor = 'var(--checkbox-checked-color)';
+
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(opt));
+      div.appendChild(label);
+    });
+    return div;
+  }
+
+  createTextInput(q, idx) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Type your answer...';
+    input.style.cssText = 'width: 100%; padding: 10px 12px; border: none; background: var(--button-bg); color: var(--text-color); font-size: 14px; box-sizing: border-box; font-family: inherit; border-radius: 3px;';
+    input.onfocus = () => input.style.borderColor = 'var(--input-focus-border-color)';
+    input.onblur = () => input.style.borderColor = 'var(--main-border-color)';
+    input.addEventListener('input', (e) => {
+      this.userAnswers[idx] = e.target.value.toLowerCase().trim();
+    });
+    return input;
+  }
+
+  createTrueFalse(q, idx) {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.gap = '10px';
+
+    ['True', 'False'].forEach((opt, i) => {
+      const label = document.createElement('label');
+      label.style.cssText = 'cursor: pointer; color: var(--text-color); font-size: 14px; padding: 10px 15px; border: 1px solid var(--main-border-color); border-radius: 3px; transition: all 0.2s;';
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = `q${idx}`;
+      input.value = i;
+      input.style.accentColor = 'var(--checkbox-checked-color)';
+      input.addEventListener('change', () => {
+        this.userAnswers[idx] = i === 0;
+        Array.from(div.querySelectorAll('label')).forEach(l => {
+          l.style.borderColor = 'var(--main-border-color)';
+          l.style.background = 'transparent';
+        });
+        label.style.borderColor = 'var(--link-color)';
+        label.style.background = 'var(--tb-even-bg)';
+      });
+      input.style.marginRight = '8px';
+
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(opt));
+      div.appendChild(label);
+    });
+    return div;
+  }
+
+  createArrangeQuestion(q, idx) {
+    const div = document.createElement('div');
+    div.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+    div.dataset.qIdx = idx;
+
+    const items = [...(q.items || [])].map((item, i) => ({text: item, id: i}));
+
+    // Shuffle items
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+
+    let draggedEl = null;
+
+    items.forEach(item => {
+      const el = document.createElement('div');
+      el.draggable = true;
+      el.dataset.id = item.id;
+      el.textContent = item.text;
+      el.style.cssText = 'padding: 10px 12px; background: var(--link-color); color: var(--main-bg); border-radius: 3px; cursor: move; user-select: none; font-weight: bold;';
+
+      el.addEventListener('dragstart', () => { draggedEl = el; el.style.opacity = '0.5'; });
+      el.addEventListener('dragend', () => { el.style.opacity = '1'; draggedEl = null; });
+      el.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+      el.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedEl && draggedEl !== el) {
+          const rect = el.getBoundingClientRect();
+          if (e.clientY - rect.top < rect.height / 2) {
+            div.insertBefore(draggedEl, el);
+          } else {
+            div.insertBefore(draggedEl, el.nextSibling);
+          }
+        }
+      });
+
+      div.appendChild(el);
+    });
+
+    this.userAnswers[idx] = [];
+    div.addEventListener('dragend', () => {
+      const order = Array.from(div.children).map(el => parseInt(el.dataset.id));
+      this.userAnswers[idx] = order;
+    });
+
+    return div;
+  }
+
+  checkAnswers() {
+    let correct = 0;
+    this.quizData.questions.forEach((q, idx) => {
+      const userAns = this.userAnswers[idx];
+      let isCorrect = false;
+      let correctAnswer = '';
+
+      if (q.type === 'multiple-choice') {
+        isCorrect = userAns === q.correct;
+        correctAnswer = q.options[q.correct];
+      } else if (q.type === 'text') {
+        isCorrect = userAns === q.correct.toLowerCase().trim();
+        correctAnswer = q.correct;
+      } else if (q.type === 'true-false') {
+        isCorrect = userAns === q.correct;
+        correctAnswer = q.correct ? 'True' : 'False';
+      } else if (q.type === 'arrange') {
+        isCorrect = JSON.stringify(userAns) === JSON.stringify(q.correct);
+        correctAnswer = q.correct.map(i => q.items[i]).join(' → ');
+      }
+
+      if (isCorrect) correct++;
+
+      // Show feedback
+      this.showFeedback(idx, isCorrect, correctAnswer);
+    });
+
+    return {correct, total: this.quizData.questions.length};
+  }
+
+  showFeedback(index, isCorrect, correctAnswer) {
+    const feedback = document.querySelector(`[data-feedback="${index}"]`);
+    if (!feedback) return;
+
+    feedback.style.display = 'block';
+
+    if (isCorrect) {
+      feedback.style.background = 'var(--prompt-tip-bg)';
+      feedback.style.border = '1px solid var(--prompt-tip-icon-color)';
+      feedback.style.color = 'var(--prompt-tip-icon-color)';
+      feedback.textContent = '✓ Correct!';
+    } else {
+      feedback.style.background = 'var(--prompt-danger-bg)';
+      feedback.style.border = '1px solid var(--prompt-danger-icon-color)';
+      feedback.style.color = 'var(--prompt-danger-icon-color)';
+      feedback.textContent = `✗ Incorrect. Correct answer: ${correctAnswer}`;
+    }
+  }
+}
+
+// Load quiz data from Jekyll include parameter
+const quizData = {{ include.quiz | jsonify }};
+
+const quiz = new QuizEngine(quizData);
+
+document.getElementById('submitQuizBtn').addEventListener('click', () => {
+  const result = quiz.checkAnswers();
+  const resultDiv = document.getElementById('quizResult');
+  resultDiv.textContent = `You got ${result.correct}/${result.total} correct! (${Math.round(result.correct/result.total*100)}%)`;
+});
+</script>

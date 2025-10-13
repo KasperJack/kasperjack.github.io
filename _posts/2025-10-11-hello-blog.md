@@ -1,14 +1,15 @@
 ---
 title: Hello blog
 date: 2025-10-11 17:48:30 +0100
-tags: [style, markdown, chirpy]
-categories: [test]
+categories: [] ### [TOP_CATEGORY, SUB_CATEGORY]
+tags: []     # TAG names should always be lowercase
 #description: Short summary of the post.
 ---
 
 ## 👋 Hello, Blog. Finally,
 
 
+<p align="center">السلام عليكم ورحمة الله وبركاته</p>
 
 
 I’ve been meaning to start this for a while a place to write about the tech I mess with, the things I break, and what I learn (or don’t).
@@ -23,5 +24,9 @@ Linux, networking, virtualization, native desktop UIs, malware analysis, backend
  
 if I poke it, break it, or fix it, it might end up here
 
+
+## Thanks
+
+> Big thanks to [YaGaMi59](https://github.com/YaGaMi59), [R.T.B.D.G](https://github.com/R.T.B.D.G), and [MohamedH110](https://github.com/MohamedH110) — my amazing teammates from the Dizman Systems — for their support as I start this journey.
 
 
